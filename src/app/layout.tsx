@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Sidebar } from "@/components/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,10 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ripple Orders — Real-Time Order Tracking",
-  description:
-    "Production-ready real-time order tracking dashboard powered by Supabase and Server-Sent Events. Track orders from placement to delivery with live streaming updates.",
-  keywords: ["orders", "realtime", "tracking", "dashboard", "supabase", "sse"],
+  title: "Ripple - Orders",
+  description: "Real-time order tracking dashboard with live updates.",
 };
 
 export default function RootLayout({
@@ -29,7 +28,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body>{children}</body>
+      <body className="app-layout">
+        <Sidebar />
+        <main className="app-main">
+          {children}
+        </main>
+      </body>
     </html>
   );
 }

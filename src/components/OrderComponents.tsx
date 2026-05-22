@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { OrderStatus } from "@/types/order";
 
 interface CreateOrderFormProps {
@@ -80,39 +81,25 @@ export function CreateOrderForm({ onSubmit }: CreateOrderFormProps) {
         {submitting ? (
           <span className="spinner" />
         ) : (
-          <>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M8 3v10M3 8h10"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-            Place Order
-          </>
+          "Place Order"
         )}
       </button>
     </form>
   );
 }
 
-/* ─── Status Badge ─── */
+/* Status Badge */
 
 const STATUS_CONFIG: Record<
   OrderStatus,
-  { label: string; className: string; icon: string }
+  { label: string; className: string }
 > = {
-  pending: { label: "Pending", className: "status-pending", icon: "⏳" },
-  confirmed: { label: "Confirmed", className: "status-confirmed", icon: "✓" },
-  preparing: { label: "Preparing", className: "status-preparing", icon: "🍳" },
-  out_for_delivery: {
-    label: "Out for Delivery",
-    className: "status-delivery",
-    icon: "🚚",
-  },
-  delivered: { label: "Delivered", className: "status-delivered", icon: "✅" },
-  cancelled: { label: "Cancelled", className: "status-cancelled", icon: "✕" },
+  pending: { label: "Pending", className: "status-pending" },
+  confirmed: { label: "Confirmed", className: "status-confirmed" },
+  preparing: { label: "Preparing", className: "status-preparing" },
+  out_for_delivery: { label: "In Transit", className: "status-delivery" },
+  delivered: { label: "Delivered", className: "status-delivered" },
+  cancelled: { label: "Cancelled", className: "status-cancelled" },
 };
 
 const STATUS_FLOW: OrderStatus[] = [
@@ -127,13 +114,12 @@ export function StatusBadge({ status }: { status: OrderStatus }) {
   const config = STATUS_CONFIG[status];
   return (
     <span className={`status-badge ${config.className}`}>
-      <span className="status-icon">{config.icon}</span>
       {config.label}
     </span>
   );
 }
 
-/* ─── Order Card ─── */
+/* Order Card */
 
 interface OrderCardProps {
   order: {
@@ -166,52 +152,24 @@ export function OrderCard({
 
   return (
     <div className={`order-card ${isNew ? "order-card-new" : ""}`}>
-      <div className="order-card-header">
-        <div className="order-card-id">
-          #{order.id.slice(0, 8)}
-        </div>
-        <StatusBadge status={order.status} />
+      <Link href={`/orders/${order.id}`} className="order-card-id" style={{ textDecoration: "none" }}>
+        #{order.id.slice(0, 8)}
+      </Link>
+      <div className="order-card-customer">
+        {order.customer_name}
       </div>
-
-      <div className="order-card-body">
-        <div className="order-card-customer">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="order-card-icon">
-            <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.5" />
-            <path
-              d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-          {order.customer_name}
-        </div>
-        <div className="order-card-item">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="order-card-icon">
-            <rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M5 7h6M5 10h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          {order.item}
-          <span className="order-card-qty">×{order.quantity}</span>
-        </div>
-        <div className="order-card-time">{timeAgo}</div>
+      <div className="order-card-item">
+        {order.item}
+        <span className="order-card-qty">x{order.quantity}</span>
+        <span className="order-card-time">{timeAgo}</span>
       </div>
-
+      <StatusBadge status={order.status} />
       <div className="order-card-actions">
         {nextStatus && order.status !== "cancelled" && (
           <button
             className="btn-advance"
             onClick={() => onUpdateStatus(order.id, nextStatus)}
           >
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M3 8h10M9 4l4 4-4 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
             {STATUS_CONFIG[nextStatus].label}
           </button>
         )}
@@ -239,38 +197,24 @@ export function OrderCard({
           </svg>
         </button>
       </div>
-
-      {/* Progress bar */}
-      {order.status !== "cancelled" && (
-        <div className="order-progress">
-          {STATUS_FLOW.map((s, i) => (
-            <div
-              key={s}
-              className={`progress-step ${
-                i <= currentIndex ? "progress-step-active" : ""
-              }`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
 
-/* ─── Connection Indicator ─── */
+/* Connection Indicator */
 
 export function ConnectionIndicator({ connected }: { connected: boolean }) {
   return (
     <div className={`connection-indicator ${connected ? "connected" : "disconnected"}`}>
       <span className="connection-dot" />
       <span className="connection-text">
-        {connected ? "Live" : "Reconnecting…"}
+        {connected ? "Live" : "Reconnecting..."}
       </span>
     </div>
   );
 }
 
-/* ─── Event Toast ─── */
+/* Event Toast */
 
 export function EventToast({ event }: { event: { type: string; record: { customer_name: string; item: string } } | null }) {
   if (!event) return null;
@@ -289,7 +233,7 @@ export function EventToast({ event }: { event: { type: string; record: { custome
   );
 }
 
-/* ─── Stats Bar ─── */
+/* Stats Bar */
 
 export function StatsBar({
   orders,
@@ -332,7 +276,7 @@ export function StatsBar({
   );
 }
 
-/* ─── Helpers ─── */
+/* Helpers */
 
 function getTimeAgo(dateStr: string): string {
   const now = Date.now();
