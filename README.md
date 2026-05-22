@@ -1,6 +1,6 @@
 # Ripple
 
-Ripple is an operational, real-time orders dashboard built for SaaS workflows. It's designed dark-mode-first with a focus on readability and utility, providing instant state synchronization without relying on client-side polling.
+Ripple is an operational, real-time orders dashboard built for SaaS workflows. It's designed with a focus on readability and utility, providing instant state synchronization without relying on client-side polling.
 
 ## Architecture Stack
 
