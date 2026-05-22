@@ -37,12 +37,8 @@ function formatTimestamp(): string {
 
 function printBanner() {
   console.log(`
-${COLORS.cyan}${COLORS.bold}╔══════════════════════════════════════════════╗
-║           🌊 Ripple Orders — CLI             ║
-║          Real-Time Order Watcher             ║
-╚══════════════════════════════════════════════╝${COLORS.reset}
-
-${COLORS.dim}Connecting to: ${STREAM_URL}${COLORS.reset}
+${COLORS.cyan}${COLORS.bold}  Ripple - Order Watcher${COLORS.reset}
+${COLORS.dim}  Connecting to: ${STREAM_URL}${COLORS.reset}
 `);
 }
 
@@ -57,22 +53,22 @@ function printEvent(type: string, data: Record<string, unknown>) {
   switch (type) {
     case "INSERT":
       typeColor = COLORS.green;
-      typeIcon = "✚";
+      typeIcon = "+";
       typeBg = COLORS.bgGreen;
       break;
     case "UPDATE":
       typeColor = COLORS.blue;
-      typeIcon = "✎";
+      typeIcon = "~";
       typeBg = COLORS.bgBlue;
       break;
     case "DELETE":
       typeColor = COLORS.red;
-      typeIcon = "✕";
+      typeIcon = "x";
       typeBg = COLORS.bgRed;
       break;
     default:
       typeColor = COLORS.white;
-      typeIcon = "•";
+      typeIcon = "*";
       typeBg = "";
   }
 
@@ -80,7 +76,7 @@ function printEvent(type: string, data: Record<string, unknown>) {
     `${COLORS.dim}${time}${COLORS.reset}  ` +
       `${typeBg}${COLORS.bold} ${typeIcon} ${type.padEnd(6)} ${COLORS.reset}  ` +
       `${COLORS.bold}${record.customer_name}${COLORS.reset}  ` +
-      `${COLORS.dim}${record.item} ×${record.quantity}${COLORS.reset}  ` +
+      `${COLORS.dim}${record.item} x${record.quantity}${COLORS.reset}  ` +
       `${typeColor}[${record.status}]${COLORS.reset}`
   );
 
@@ -88,13 +84,13 @@ function printEvent(type: string, data: Record<string, unknown>) {
     const oldRecord = data.old_record as Record<string, unknown>;
     if (oldRecord.status !== record.status) {
       console.log(
-        `           ${COLORS.dim}Status: ${oldRecord.status} → ${COLORS.reset}${typeColor}${record.status}${COLORS.reset}`
+        `           ${COLORS.dim}Status: ${oldRecord.status} -> ${COLORS.reset}${typeColor}${record.status}${COLORS.reset}`
       );
     }
   }
 }
 
-// ─── Main ───
+// --- Main ---
 
 printBanner();
 
@@ -102,17 +98,17 @@ const es = new EventSource(STREAM_URL);
 
 es.onopen = () => {
   console.log(
-    `${COLORS.green}${COLORS.bold}✓ Connected${COLORS.reset} ${COLORS.dim}— listening for order events…${COLORS.reset}\n`
+    `${COLORS.green}${COLORS.bold}OK Connected${COLORS.reset} ${COLORS.dim}-- listening for order events...${COLORS.reset}\n`
   );
 };
 
 es.onerror = (err) => {
   const detail = err as Event & { status?: number };
   console.error(
-    `${COLORS.red}✕ Connection error${COLORS.reset}`,
+    `${COLORS.red}ERR Connection error${COLORS.reset}`,
     detail.status ? `(status: ${detail.status})` : ""
   );
-  console.log(`${COLORS.dim}  Reconnecting…${COLORS.reset}`);
+  console.log(`${COLORS.dim}  Reconnecting...${COLORS.reset}`);
 };
 
 for (const eventType of ["INSERT", "UPDATE", "DELETE"]) {
@@ -128,7 +124,7 @@ for (const eventType of ["INSERT", "UPDATE", "DELETE"]) {
 
 // Handle graceful shutdown
 process.on("SIGINT", () => {
-  console.log(`\n${COLORS.dim}Disconnecting…${COLORS.reset}`);
+  console.log(`\n${COLORS.dim}Disconnecting...${COLORS.reset}`);
   es.close();
   process.exit(0);
 });

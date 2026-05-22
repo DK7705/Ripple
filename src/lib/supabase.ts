@@ -25,7 +25,7 @@ export function getSupabase(): SupabaseClient {
   return _supabase;
 }
 
-/** @deprecated Use `getSupabase()` instead — kept for import compatibility */
+/** @deprecated Use `getSupabase()` instead -- kept for import compatibility */
 export const supabase = new Proxy({} as SupabaseClient, {
   get(_target, prop) {
     return Reflect.get(getSupabase(), prop);

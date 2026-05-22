@@ -48,7 +48,7 @@ export async function GET() {
             try {
               controller.enqueue(encoder.encode(data));
             } catch {
-              // Client disconnected — clean up
+              // Client disconnected
               cleanup();
             }
           }
@@ -65,7 +65,7 @@ export async function GET() {
       }, 15_000);
     },
     cancel() {
-      // Stream was cancelled by the client — clean up resources
+      // Client disconnected -- clean up resources
       cleanup();
     },
   });
